@@ -1,0 +1,36 @@
+html,body,#app{
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    min-width: 1366px;
+    /*overflow-y: scroll;*/
+}
+.el-breadcrumb{
+    margin-bottom: 15px;
+    font-size: 12px;
+}
+.el-card{
+    box-shadow: 0 1px 1px 0 rgba(0,0,0,.15)!important;
+}
+.el-table{
+    margin-top: 15px;
+    font-size: 12px;
+}
+.el-pagination{
+    margin-top: 15px;
+}
+.el-cascader-menu {
+    height: 300px;
+}
+.labClass .el-form-item__label {
+    color: #fff!important;
+}
+.el-header{
+    height: 66px!important;
+}
+.avator{
+    width: 125px;
+}
+.rowCenter{
+    display: flex;flex-direction: row;align-items: center
+}
