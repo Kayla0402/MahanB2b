@@ -38,7 +38,11 @@ import {
   Tree,
   RadioGroup,
   Radio,
-  RadioButton
+  RadioButton,
+  Dropdown,
+  DropdownMenu,
+  DropdownItem,
+  InputNumber
 } from 'element-ui'
 
 Vue.use(Button)
@@ -78,5 +82,9 @@ Vue.use(CheckboxGroup)
 Vue.use(RadioGroup)
 Vue.use(Radio)
 Vue.use(RadioButton)
+Vue.use(Dropdown)
+Vue.use(DropdownMenu)
+Vue.use(DropdownItem)
+Vue.use(InputNumber)
 Vue.prototype.$message = Message
 Vue.prototype.$confirm = MessageBox.confirm

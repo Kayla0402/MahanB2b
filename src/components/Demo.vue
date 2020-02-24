@@ -476,45 +476,168 @@
 <!--  }-->
 <!--</style>-->
 
+<!--<template>-->
+<!--  <div>-->
+<!--    <br>-->
+<!--    <input type="text" id="test" v-model="date" class="ipt">-->
+<!--  </div>-->
+<!--</template>-->
+<!--<script>-->
+<!--export default {-->
+<!--  name: 'hello',-->
+<!--  data () {-->
+<!--    return {-->
+<!--      date: null,-->
+<!--      // 获取全局的laydate，带入到组件中-->
+<!--      laydate: window.laydate,-->
+<!--      results: ['2017-08-09', '2017-09-11', '2017-09-24', '2018-01-12'],-->
+<!--      mark: null-->
+<!--    }-->
+<!--  },-->
+<!--  mounted() {-->
+<!--    this.laydate.render({-->
+<!--      elem: '#test',-->
+<!--      value: '',-->
+<!--      showBottom: false,-->
+<!--      mark: {-->
+<!--        '2020-2-28': ''-->
+<!--      },-->
+<!--      min: 0,-->
+<!--      done: (value) => {-->
+<!--        // 2020-02-25-->
+<!--        this.date = value-->
+<!--      }-->
+<!--    })-->
+<!--  },-->
+<!--  methods: {-->
+<!--  }-->
+<!--}-->
+<!--</script>-->
+<!--<style scoped>-->
+<!--  .laydate-day-mark{-->
+<!--    background-color: red;-->
+<!--  }-->
+<!--</style>-->
+
 <template>
-  <div>
-    <br>
-    <input type="text" id="test" v-model="date" class="ipt">
-  </div>
+   <div class="search_num">
+     <div adult-count="pageObj.adultCount" child-count="pageObj.childCount" total-count="pageObj.totalCount" @mouseover="showNum=true" @mouseleave="showNum=false">
+       <input class="selectValue" type="button" value="23"> 人
+       <div class="selectOL" v-if="showNum">
+         <div class="li">
+           <span class="ng-binding">成人</span>
+           <div class="numberEmp clearfix">
+             <input class="numBtn plus adult" type="button" value="+">
+             <input class="number number_1" type="button" value="20">
+             <input class="numBtn reduce adult" type="button" value="-">
+           </div>
+         </div>
+         <div class="li">
+           <span class="ng-binding">儿童</span>
+           <div class="numberEmp clearfix">
+             <input class="numBtn plus child" type="button" value="+">
+             <input class="number number_2" type="button" value="3">
+             <input class="numBtn reduce child" type="button" value="-">
+           </div>
+         </div>
+       </div>
+     </div>
+   </div>
 </template>
 <script>
 export default {
-  name: 'hello',
-  data () {
+  data() {
     return {
-      date: null,
-      // 获取全局的laydate，带入到组件中
-      laydate: window.laydate,
-      results: ['2017-08-09', '2017-09-11', '2017-09-24', '2018-01-12'],
-      mark: null
+      totalCount: 0,
+      adultCount: 1,
+      childCount: 0,
+      showNum: false
     }
-  },
-  mounted() {
-    this.laydate.render({
-      elem: '#test',
-      value: '',
-      showBottom: false,
-      mark: {
-        '2020-2-28': ''
-      },
-      min: 0,
-      done: (value) => {
-        // 2020-02-25
-        this.date = value
-      }
-    })
   },
   methods: {
   }
 }
 </script>
 <style scoped>
-  .laydate-day-mark{
-    background-color: red;
+  .search_num {
+    margin-left: 50px;
+    margin-top: 50px;
+    background: #fff;
+    cursor: pointer;
+    line-height: 50px;
+    float: left;
+    margin-right: 0.5%;
+    width: 15%;
+    position: relative;
+    white-space: nowrap;
+    width: 8%;
+    border: 1px solid #D4B364;
+  }
+
+  .selectValue {
+    width: 50px;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    vertical-align: top;
+    line-height: 50px;
+    height: 50px;
+    cursor: pointer;
+    border: none;
+    background: transparent;
+    display: inline-block;
+  }
+
+  .selectOL {
+    position: absolute;
+    left: 0;
+    top: 100%;
+    /* display: none; */
+    min-width: 100%;
+    box-shadow: 0 5px 15px -5px #333;
+  }
+
+  .li {
+    background: #fff;
+    margin-top: 1px;
+    padding: 10px 15px;
+    line-height: 30px;
+  }
+
+  .numberEmp {
+    display: inline-block;
+    vertical-align: top;
+    margin-left: 6px;
+  }
+
+  .numberEmp .numBtn {
+    width: 30px;
+    text-align: center;
+    background: url(../assets/images/plus.png) no-repeat;
+    text-indent: -999px;
+  }
+
+  .numberEmp input {
+    line-height: 30px;
+    height: 30px;
+    vertical-align: top;
+    border: none
+  }
+
+  .numberEmp .reduce {
+    background-position: 0 -30px;
+  }
+
+  .selectOL .li {
+    background: #fff;
+    margin-top: 1px;
+    padding: 10px 15px;
+    line-height: 30px;
+  }
+
+  input {
+    width: 30px;
+    text-align: center;
   }
 </style>

@@ -9,13 +9,11 @@
     <!--      卡片-->
     <el-card class="box-card">
       <el-row>
-        <el-col :span="3">
-          <el-radio-group v-model="pageObj.type">
-            <el-radio-button label="OW">单程</el-radio-button>
-            <el-radio-button label="RT">往返</el-radio-button>
-          </el-radio-group>
+        <el-col :span="1">
+          <el-radio v-model="pageObj.type" label="OW">单程</el-radio>
+          <el-radio v-model="pageObj.type" label="RT">往返</el-radio>
         </el-col>
-        <el-col :span="4" class="rowCenter">
+        <el-col :span="4" class="rowCenter mL10">
           <span>出发地：</span>
           <el-cascader
             v-model="pageObj.deptCity"
@@ -45,6 +43,42 @@
           <span>到达时间:</span>
           <input type="text" id="arrDate" v-model="pageObj.arrDate" class="dateInput" @click="arrDateClick">
         </el-col>
+        <el-col :span="2" style="position: relative">
+          <div class="search_num" @mouseover="showNum=true" @mouseleave="showNum=false">
+            {{totalCount}} 人
+            <div class="selectOL" v-if="showNum">
+              <div class="li">
+                <span class="ng-binding">成人</span>
+                <div class="numberEmp clearfix">
+                  <input class="numBtn plus adult" type="button" value="+" @click="adultAdd">
+                  <input class="number number_1" type="button" v-model="pageObj.adultCount">
+                  <input class="numBtn reduce adult" type="button" value="-" @click="adultReduce">
+                </div>
+              </div>
+              <div class="li">
+                <span class="ng-binding">儿童</span>
+                <div class="numberEmp clearfix">
+                  <input class="numBtn plus child" type="button" value="+" @click="childAdd">
+                  <input class="number number_2" type="button" v-model="pageObj.childCount">
+                  <input class="numBtn reduce child" type="button" value="-" @click="childReduce">
+                </div>
+              </div>
+            </div>
+          </div>
+        </el-col>
+        <el-col :span="3">
+          <el-form style="width: 100px">
+            <el-form-item>
+              <el-select v-model="pageObj.cabinType" placeholder="活动区域">
+                <el-option label="经济舱" value="C"></el-option>
+                <el-option label="商务舱" value="Y"></el-option>
+              </el-select>
+            </el-form-item>
+          </el-form>
+        </el-col>
+        <el-col :span="1" style="display: flex;margin-left: 10px">
+          <el-button type="primary" @click="search">搜 索</el-button>
+        </el-col>
       </el-row>
     </el-card>
   </div>
@@ -53,8 +87,6 @@
 <script>
 export default {
   name: 'Search',
-  components: {
-  },
   data() {
     return {
       // 获取全局的laydate，带入到组件中
@@ -66,9 +98,9 @@ export default {
         arrCity: '',
         deptDate: '',
         arrDate: '',
-        adultCount: '',
+        adultCount: 1,
         childCount: '',
-        cabinType: ''
+        cabinType: 'C'
       },
       options: [
         {
@@ -108,7 +140,9 @@ export default {
       ],
       mark: {
         '2020-2-25': ''
-      }
+      },
+      // 人数选择的显示和隐藏
+      showNum: false
     }
   },
   methods: {
@@ -151,9 +185,32 @@ export default {
           this.pageObj.arrDate = value
         }
       })
+    },
+    // 下拉菜单
+    handleClick() {
+      alert('button click')
+    },
+    adultAdd() {
+      return this.pageObj.adultCount >= 9 ? 9 : this.pageObj.adultCount++
+    },
+    adultReduce() {
+      return this.pageObj.adultCount <= 1 ? 1 : this.pageObj.adultCount--
+    },
+    childAdd() {
+      return this.pageObj.childCount >= 9 ? 9 : this.pageObj.childCount++
+    },
+    childReduce() {
+      return this.pageObj.childCount <= 0 ? 0 : this.pageObj.childCount--
+    },
+    // 搜索
+    search() {
+      console.log(this.pageObj)
     }
   },
-  mounted() {
+  computed: {
+    totalCount() {
+      return this.pageObj.adultCount + this.pageObj.childCount
+    }
   }
 }
 </script>
@@ -175,5 +232,80 @@ export default {
     padding: 0 10px;
     width: 120px;
     margin-left: 10px;
+  }
+  .el-dropdown {
+    vertical-align: top;
+  }
+  .el-dropdown + .el-dropdown {
+    margin-left: 15px;
+  }
+  .el-icon-arrow-down {
+    font-size: 12px;
+  }
+  .el-input-number{
+    width: 120px;
+  }
+  .el-input-number[data-v-8074698e]{
+    margin-right: 15px;
+  }
+/*  人数的选择*/
+  .search_num {
+    background: #fff;
+    cursor: pointer;
+    line-height: 40px;
+    border-radius: 4px;
+    border: 1px solid #DCDFE6;
+    width: 80px;
+    text-align: center;
+  }
+  .selectOL {
+    position: absolute;
+    left: 0;
+    top: 42px;
+    min-width: 180px;
+    box-shadow: 0 5px 15px -5px #333;
+  }
+
+  .li {
+    background: #fff;
+    margin-top: 1px;
+    padding: 10px 15px;
+    line-height: 30px;
+  }
+
+  .numberEmp {
+    display: inline-block;
+    vertical-align: top;
+    margin-left: 6px;
+  }
+
+  .numberEmp .numBtn {
+    width: 30px;
+    text-align: center;
+    background: url(../../assets/images/plus.png) no-repeat;
+    text-indent: -999px;
+  }
+
+  .numberEmp input {
+    line-height: 30px;
+    height: 30px;
+    vertical-align: top;
+    border: none
+  }
+
+  .numberEmp .reduce {
+    background-position: 0 -30px;
+  }
+
+  .selectOL .li {
+    background: #fff;
+    margin-top: 1px;
+    padding: 10px 15px;
+    line-height: 30px;
+  }
+
+  input {
+    width: 30px;
+    text-align: center;
   }
 </style>

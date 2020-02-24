@@ -34,3 +34,6 @@ html,body,#app{
 .rowCenter{
     display: flex;flex-direction: row;align-items: center
 }
+.mL10{
+    margin-left: 10px
+}
