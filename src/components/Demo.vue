@@ -203,7 +203,7 @@
       <li v-for="(dayobject,index) in days" style="height: 40px;" :key="index" @click="pickDay(dayobject.day)">
         <!--本月-->
         <!--如果不是本月  改变类名加灰色-->
-        <span v-if="dayobject.day.getMonth()+1 != currentMonth || dayobject.day.getMonth() == new Date().getMonth()&&dayobject.day.getDate() < new Date().getDate()" class="other-month">{{ dayobject.day.getDate() }}</span>
+        <span v-if="dayobject.day.getMonth()+1 < currentMonth || dayobject.day.getMonth() == new Date().getMonth()&&dayobject.day.getDate() < new Date().getDate()" class="other-month">{{ dayobject.day.getDate() }}</span>
 
         <!--如果是本月  还需要判断是不是这一天-->
         <span v-else>
@@ -213,10 +213,6 @@
             class="active">{{ dayobject.day.getDate() }}</span>
           <span v-else>{{ dayobject.day.getDate() }}</span>
         </span>
-        <!--显示剩余多少数量-->
-        <p v-if="leftobj[dayobject.index]">
-          剩余：
-          <span style="color: red">{{leftobj[dayobject.index].count}}</span></p>
       </li>
     </ul>
   </div>
@@ -232,13 +228,6 @@ export default {
       currentYear: 1970,
       currentWeek: 1,
       days: [],
-      leftobj: [ // 存放剩余数量
-        { count: 1 },
-        { count: 2 },
-        { count: 3 },
-        { count: 4 },
-        { count: 5 }
-      ],
       activeDays: ['2020-02-28', '2020-02-29', '2020-03-10', '2020-03-15']
     }
   },
@@ -246,11 +235,8 @@ export default {
     this.initData(null)
   },
   methods: {
-    // order: function (day) { // 预定函数
-    //   console.log(day)
-    //   if (this.leftobj[day.index].count >= 1) { this.leftobj[day.index].count-- } else { alert('已经没有位置了') }
-    // },
     initData: async function(cur) {
+      // console.log(this.activeDays)
       // let leftcount = 0 // 存放剩余数量
       let date
       let index = 0 // 控制显示预定的天数 ，比如下面设置只能预定三天的
@@ -288,19 +274,16 @@ export default {
         let dayobject = {}
         dayobject.day = d
         // console.log(dayobject)
-        let now = new Date()
+        // let now = new Date()
         // console.log(d.getDate())
         // 当前年月的第一天之前的日期===当前时间
         // console.log(d.getMonth())
         // console.log(d.getFullYear())
-        console.log(this.formatDate(d.getFullYear(), d.getMonth() + 1, d.getDate()))// =======2020-02-01
-
-        if (d.getDate() === (now.getDate()) && d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear()) {
+        // console.log(this.formatDate(d.getFullYear(), d.getMonth() + 1, d.getDate()))// =======2020-02-01
+        d = this.formatDate(d.getFullYear(), d.getMonth() + 1, d.getDate())
+        if (this.activeDays.indexOf(d) > -1) {
           dayobject.index = index++// 从今天开始显示供预定的数量
-        } else if (index !== 0 && index < 3) {
-          dayobject.index = index++
-        }// 从今天开始3天内显示供预定的数量
-        // console.log(dayobject)
+        }
         this.days.push(dayobject)// 将日期放入data 中的days数组 供页面渲染使用
       }
       // 其他周
@@ -309,10 +292,8 @@ export default {
         d.setDate(d.getDate() + i)
         let dayobject = {}
         dayobject.day = d
-        let now = new Date()
-        if (d.getDate() === (now.getDate()) && d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear()) {
-          dayobject.index = index++
-        } else if (index !== 0 && index < 3) {
+        d = this.formatDate(d.getFullYear(), d.getMonth() + 1, d.getDate())
+        if (this.activeDays.indexOf(d) > -1) {
           dayobject.index = index++
         }
         this.days.push(dayobject)

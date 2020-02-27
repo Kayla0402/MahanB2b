@@ -21,7 +21,7 @@
             class="city"
             :props="{ expandTrigger: 'hover' }"
             :show-all-levels="false"
-            @change="handleChange">
+            @change="handleChangeDep" clearable>
           </el-cascader>
         </el-col>
         <el-col :span="4" class="rowCenter">
@@ -32,16 +32,23 @@
             class="city"
             :props="{ expandTrigger: 'hover' }"
             :show-all-levels="false"
-            @change="handleChange">
+            @change="handleChangeArr" clearable>
           </el-cascader>
         </el-col>
-        <el-col :span="4" class="rowCenter">
-          <span>出发时间:</span>
-          <input type="text" id="deptDate" v-model="pageObj.deptDate" class="dateInput" @click="deptDateClick">
+        <el-col :span="4" class="rowCenter date">
+          出发日期：
+          <el-input
+            placeholder="请选择出发日期"
+            v-model="pageObj.deptDate" @focus="deptDateFocus" @blur="deptDateBlur">
+          </el-input>
+          <calendar class="calendar" v-if="showDepDate" :dates="deptCalendar"/>
         </el-col>
-        <el-col :span="4" class="rowCenter" v-if="pageObj.type==='RT'">
-          <span>到达时间:</span>
-          <input type="text" id="arrDate" v-model="pageObj.arrDate" class="dateInput" @click="arrDateClick">
+        <el-col :span="4" class="rowCenter date" v-if="pageObj.type==='RT'">
+          返程日期：
+          <el-input
+            placeholder="请选择出发日期"
+            v-model="pageObj.arrDate">
+          </el-input>
         </el-col>
         <el-col :span="2" style="position: relative">
           <div class="search_num" @mouseover="showNum=true" @mouseleave="showNum=false">
@@ -66,7 +73,7 @@
             </div>
           </div>
         </el-col>
-        <el-col :span="3">
+        <el-col :span="2">
           <el-form style="width: 100px">
             <el-form-item>
               <el-select v-model="pageObj.cabinType" placeholder="活动区域">
@@ -76,115 +83,177 @@
             </el-form-item>
           </el-form>
         </el-col>
-        <el-col :span="1" style="display: flex;margin-left: 10px">
+        <el-col :span="1" style="display: flex;margin-left: 5px">
           <el-button type="primary" @click="search">搜 索</el-button>
         </el-col>
       </el-row>
+      <el-table :data="routings" border style="width: 100%" ref="searchListRef">
+        <el-table-column label="" width="50">
+          <template scope="scope">
+            <el-radio style="color: #fff" :label="scope.$index" v-model="bookParams" @change.native="checkSearch(scope.row)"></el-radio>
+          </template>
+        </el-table-column>
+        <el-table-column label="航班号" >
+          <template slot-scope="scope">
+            <p v-for="(num,a) in scope.row.depSegments" :key="a">{{num.flightNo}}</p>
+            <p class="ret" v-for="(num,b) in scope.row.retSegments" :key="'ret-'+b">{{num.flightNo}}</p>
+          </template>
+        </el-table-column>
+        <el-table-column prop="name" label="出发机场">
+          <template slot-scope="scope">
+            <p v-for="(num,c) in scope.row.depSegments" :key="c">{{num.depAirportStr}}</p>
+            <p class="ret" v-for="(num,d) in scope.row.retSegments" :key="'ret-'+d">{{num.depAirportStr}}</p>
+          </template>
+        </el-table-column>
+        <el-table-column prop="address" label="到达机场">
+          <template slot-scope="scope">
+            <p v-for="(num,e) in scope.row.depSegments" :key="e">{{num.arrAirportStr}}</p>
+            <p class="ret" v-for="(num,f) in scope.row.retSegments" :key="'ret-'+f">{{num.arrAirportStr}}</p>
+          </template>
+        </el-table-column>
+        <el-table-column prop="address" label="出发时间">
+          <template slot-scope="scope">
+            <p v-for="(num,g) in scope.row.depSegments" :key="g">{{num.depDate | dateReset}}</p>
+            <p class="ret" v-for="(num,h) in scope.row.retSegments" :key="'ret-'+h">{{num.depDate | dateReset}}</p>
+          </template>
+        </el-table-column>
+        <el-table-column label="到达时间">
+          <template slot-scope="scope">
+            <p v-for="(num,i) in scope.row.depSegments" :key="i">{{num.arrDate | dateReset}}</p>
+            <p class="ret" v-for="(num,j) in scope.row.retSegments" :key="'ret-'+j">{{num.arrDate | dateReset}}</p>
+          </template>
+        </el-table-column>
+        <el-table-column label="历时">
+          <template slot-scope="scope">
+            <p v-for="(num,k) in scope.row.depSegments" :key="k">{{num.journeyDuration}}</p>
+            <p class="ret" v-for="(num,l) in scope.row.retSegments" :key="'ret-'+l">{{num.journeyDuration}}</p>
+          </template>
+        </el-table-column>
+        <el-table-column label="舱种">
+          <template slot-scope="scope">
+            <p v-for="(num,f) in scope.row.depSegments" :key="f">
+              <span v-if="num.cabinType === 'Y'">经济舱</span>
+              <span v-else>商务舱</span>
+            </p>
+          </template>
+        </el-table-column>
+        <el-table-column prop="totalFare" label="价格" width="80"></el-table-column>
+      </el-table>
     </el-card>
   </div>
 </template>
 
 <script>
+// 引入城市数据
+import citys from '../../constants/Citys'
+// 导入日期组件
+import Calendar from '../common/Calendar'
+Object.freeze(citys)
 export default {
   name: 'Search',
+  components: {
+    Calendar
+  },
   data() {
     return {
-      // 获取全局的laydate，带入到组件中
-      laydate: window.laydate,
       // 查询参数
       pageObj: {
         type: 'OW',
         deptCity: '',
         arrCity: '',
-        deptDate: '',
-        arrDate: '',
+        deptDate: '2020-02-28',
+        arrDate: '2020-03-29',
         adultCount: 1,
-        childCount: '',
-        cabinType: 'C'
+        childCount: 0,
+        cabinType: 'C',
+        startDate: '1990-01-01',
+        endDate: '2222-01-01'
       },
-      options: [
-        {
-          value: 'CN',
-          label: '中国',
-          children: [{
-            value: 'SHA',
-            label: '上海'
-          }, {
-            value: 'BJS',
-            label: '北京'
-          }]
-        },
-        {
-          value: 'IR',
-          label: '伊朗',
-          children: [{
-            value: 'SYZ',
-            label: '设拉子'
-          }, {
-            value: 'THR',
-            label: '德黑兰'
-          }
-          ]
-        },
-        {
-          value: 'IQ',
-          label: '伊拉克',
-          children: [{
-            value: 'ISU',
-            label: '苏莱曼尼亚'
-          }, {
-            value: 'EBL',
-            label: '埃尔比勒'
-          }]
-        }
-      ],
-      mark: {
-        '2020-2-25': ''
-      },
+      options: citys,
       // 人数选择的显示和隐藏
-      showNum: false
+      showNum: false,
+      // 单程测试请求参数
+      test: {
+        'adultCount': 1,
+        'arrCity': 'IKA',
+        'cabinType': 'Y',
+        'childCount': 0,
+        'deptCity': 'PVG',
+        'deptDate': '20200326',
+        'returnDate': null
+      },
+      // 单程多段
+      test1: {
+        'adultCount': 1,
+        'arrCity': 'THR',
+        'cabinType': 'Y',
+        'childCount': 0,
+        'deptCity': 'SYZ',
+        'deptDate': '20200313',
+        'returnDate': null
+      },
+      // 单程多段转机
+      test2: {
+        'adultCount': 1,
+        'arrCity': 'IST',
+        'cabinType': 'Y',
+        'childCount': 0,
+        'deptCity': 'PVG',
+        'deptDate': '20200515',
+        'returnDate': null
+      },
+      // 单程单段转机
+      test3: {
+        'adultCount': 1,
+        'arrCity': 'MOW',
+        'cabinType': 'Y',
+        'childCount': 0,
+        'deptCity': 'PVG',
+        'deptDate': '20200425',
+        'returnDate': null
+      },
+      // 往返多段转机
+      test4: {
+        'adultCount': 1,
+        'arrCity': 'IST',
+        'cabinType': 'Y',
+        'childCount': 0,
+        'deptCity': 'PVG',
+        'deptDate': '20200512',
+        'returnDate': '20200519'
+      },
+      // 总的航班信息
+      routings: [],
+      // 单选
+      radio: 1,
+      bookParams: '',
+      // 时间的获取参数
+      getTime: {
+        'arrCity': 'SHA',
+        'deptCity': 'IST',
+        'endDate': '2222-01-01',
+        'startDate': '1990-01-01'
+      },
+      // 控制去程日历的显示
+      showDepDate: false,
+      // 去程时间数据
+      deptCalendar: []
     }
   },
   methods: {
-    handleChange(value) {
-      console.log(value)
+    handleChangeDep(value) {
+      if (value.length > 0) {
+        this.pageObj.deptCity = value[1]
+      } else {
+        this.pageObj.deptCity = ''
+      }
     },
-    // 选择出发日期
-    deptDateClick() {
-      this.laydate.render({
-        elem: '#deptDate',
-        value: '',
-        showBottom: false,
-        mark: this.mark,
-        trigger: 'click',
-        min: 0,
-        change: (value, date, endDate) => {
-          console.log(value)
-        },
-        done: (value) => {
-          console.log(555)
-          // 2020-02-25
-          this.pageObj.deptDate = value
-        }
-      })
-    },
-    // 选择到达日期
-    arrDateClick() {
-      this.laydate.render({
-        elem: '#arrDate',
-        value: '',
-        showBottom: false,
-        mark: this.mark,
-        trigger: 'click',
-        min: 0,
-        ready: function(date) {
-          // 得到初始的日期时间对象：{year: 2017, month: 8, date: 18, hours: 0, minutes: 0, seconds: 0}
-        },
-        done: (value) => {
-          // 2020-02-25
-          this.pageObj.arrDate = value
-        }
-      })
+    handleChangeArr(value) {
+      if (value.length > 0) {
+        this.pageObj.arrCity = value[1]
+      } else {
+        this.pageObj.arrCity = ''
+      }
     },
     // 下拉菜单
     handleClick() {
@@ -203,8 +272,30 @@ export default {
       return this.pageObj.childCount <= 0 ? 0 : this.pageObj.childCount--
     },
     // 搜索
-    search() {
-      console.log(this.pageObj)
+    async search() {
+      // console.log(this.pageObj)
+      const { data: res } = await this.$http.post('/flight/searchFlight', this.test2)
+      if (res.status !== 0) return this.$message.error(res.msg)
+      console.log(res)
+      this.routings = res.data.routings
+      console.log(this.routings)
+    },
+    // 选去程
+    checkSearch(index) {
+      console.log(this.bookParams)
+      console.log(index)
+    },
+    // 去程日历
+    async deptDateFocus() {
+      // 获取去程日历的时间
+      if (!this.pageObj.deptCity || !this.pageObj.arrCity) return this.$message.error('请先选择出发地和目的地')
+      const { data: res } = await this.$http.post('/flight/avFlightLineCalendar', this.pageObj)
+      if (res.status !== 0) return this.$message.error(res.msg)
+      this.deptCalendar = res.data.flightScheduleCalendar
+      this.showDepDate = true
+    },
+    deptDateBlur() {
+      // this.showDepDate = false
     }
   },
   computed: {
@@ -264,6 +355,7 @@ export default {
     top: 42px;
     min-width: 180px;
     box-shadow: 0 5px 15px -5px #333;
+    z-index: 9999;
   }
 
   .li {
@@ -307,5 +399,27 @@ export default {
   input {
     width: 30px;
     text-align: center;
+  }
+/*  人数选择结束*/
+  thead .el-table-column--selection .cell{
+    display: none;
+  }
+  .el-card{
+    overflow: visible;
+  }
+  .tabelCol .el-radio__label{
+    color: #fff;
+  }
+  .date {
+    position: relative;
+  }
+  .date .el-input{
+    width: 115px;
+  }
+  .date .calendar{
+    position: absolute;
+    z-index: 99999;
+    left: 0;
+    top: 40px
   }
 </style>

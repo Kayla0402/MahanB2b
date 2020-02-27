@@ -30,6 +30,7 @@ const Add = () => import(/* webpackChunkName: "add_goods" */ '../components/good
 const Goods = () => import(/* webpackChunkName: "add_goods" */ '../components/goods/Goods')
 
 const Demo = () => import(/* webpackChunkName: "add_goods" */ '../components/Demo')
+const Calendar = () => import(/* webpackChunkName: "add_goods" */ '../components/calendar')
 const Search = () => import(/* webpackChunkName: "order" */ '../components/order/Search')
 const Reschedule = () => import(/* webpackChunkName: "order" */ '../components/order/Reschedule')
 const Refund = () => import(/* webpackChunkName: "order" */ '../components/order/Refund')
@@ -55,6 +56,9 @@ const routes = [
   },
   {
     path: '/demo', component: Demo
+  },
+  {
+    path: '/calendar', component: Calendar
   },
   // 如果是home路由的话会首先重定向到welcome路由，且Welcome组件去取代Home组件中的路由占位符
   {
@@ -97,6 +101,7 @@ router.beforeEach((to, from, next) => {
   if (to.path === '/register/tips') return next()
   if (to.path === '/resetPass') return next()
   if (to.path === '/demo') return next()
+  if (to.path === '/calendar') return next()
   const tokenStr = window.sessionStorage.getItem('token')
   if (!tokenStr) return next('/login')
   next()
