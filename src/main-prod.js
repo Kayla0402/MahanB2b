@@ -14,9 +14,6 @@ import NProgress from 'nprogress'
 // import 'nprogress/nprogress.css'
 // 树形图
 import TreeTable from 'vue-table-with-tree-grid'
-// 全局方法引用和注册
-import globalFunc from './api/global_func'
-Vue.use(globalFunc)
 
 Vue.component('tree-table', TreeTable)
 /*

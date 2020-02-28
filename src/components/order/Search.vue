@@ -38,16 +38,16 @@
         <el-col :span="4" class="rowCenter date">
           出发日期：
           <el-input
-            v-model="pageObj.deptDate" @focus="deptDateFocus" @blur="deptDateBlur">
+            v-model="pageObj.deptDate" @focus="deptDateFocus">
           </el-input>
-          <calendar class="calendar" v-show="showDepDate" :dates="deptCalendar" @pickDate="getDate"/>
+          <calendar class="calendar" v-if="showDepDate" :dates="deptCalendar" @pickDate="getDate"/>
         </el-col>
         <el-col :span="4" class="rowCenter date" v-if="pageObj.type==='RT'">
           返程日期：
           <el-input
-            v-model="pageObj.arrDate"  @focus="arrDateFocus" @blur="arrDateBlur">
+            v-model="pageObj.returnDate"  @focus="returnDateFocus">
           </el-input>
-          <calendar class="calendar" v-if="showArrDate" :dates="arrCalendar" @pickDate="getDate"/>
+          <calendar class="calendar" v-if="showReturnDate" :dates="returnCalendar" @pickDate="getDate"/>
         </el-col>
         <el-col :span="2" style="position: relative">
           <div class="search_num" @mouseover="showNum=true" @mouseleave="showNum=false">
@@ -76,8 +76,8 @@
           <el-form style="width: 100px">
             <el-form-item>
               <el-select v-model="pageObj.cabinType" placeholder="活动区域">
-                <el-option label="经济舱" value="C"></el-option>
-                <el-option label="商务舱" value="Y"></el-option>
+                <el-option label="经济舱" value="Y"></el-option>
+                <el-option label="商务舱" value="C"></el-option>
               </el-select>
             </el-form-item>
           </el-form>
@@ -138,6 +138,9 @@
         </el-table-column>
         <el-table-column prop="totalFare" label="价格" width="80"></el-table-column>
       </el-table>
+      <div class="book">
+        <el-button type="primary" @click="book" :disabled="isBook">预定</el-button>
+      </div>
     </el-card>
   </div>
 </template>
@@ -161,7 +164,7 @@ export default {
         deptCity: '',
         arrCity: '',
         deptDate: '',
-        arrDate: '',
+        returnDate: '',
         adultCount: 1,
         childCount: 0,
         cabinType: 'C',
@@ -171,81 +174,26 @@ export default {
       options: citys,
       // 人数选择的显示和隐藏
       showNum: false,
-      // 单程测试请求参数
-      test: {
-        'adultCount': 1,
-        'arrCity': 'IKA',
-        'cabinType': 'Y',
-        'childCount': 0,
-        'deptCity': 'PVG',
-        'deptDate': '20200326',
-        'returnDate': null
-      },
-      // 单程多段
-      test1: {
-        'adultCount': 1,
-        'arrCity': 'THR',
-        'cabinType': 'Y',
-        'childCount': 0,
-        'deptCity': 'SYZ',
-        'deptDate': '20200313',
-        'returnDate': null
-      },
-      // 单程多段转机
-      test2: {
-        'adultCount': 1,
-        'arrCity': 'IST',
-        'cabinType': 'Y',
-        'childCount': 0,
-        'deptCity': 'PVG',
-        'deptDate': '20200515',
-        'returnDate': null
-      },
-      // 单程单段转机
-      test3: {
-        'adultCount': 1,
-        'arrCity': 'MOW',
-        'cabinType': 'Y',
-        'childCount': 0,
-        'deptCity': 'PVG',
-        'deptDate': '20200425',
-        'returnDate': null
-      },
-      // 往返多段转机
-      test4: {
-        'adultCount': 1,
-        'arrCity': 'IST',
-        'cabinType': 'Y',
-        'childCount': 0,
-        'deptCity': 'PVG',
-        'deptDate': '20200512',
-        'returnDate': '20200519'
-      },
       // 总的航班信息
       routings: [],
       // 单选
       radio: 1,
       bookParams: '',
-      // 时间的获取参数
-      getTime: {
-        'arrCity': 'SHA',
-        'deptCity': 'IST',
-        'endDate': '2222-01-01',
-        'startDate': '1990-01-01'
-      },
       // 控制去程日历的显示
       showDepDate: false,
-      showArrDate: false,
+      showReturnDate: false,
       // 去程时间数据
       deptCalendar: {
         calendar: [],
         type: 'dept'
       },
       // 返程时间数据
-      arrCalendar: {
+      returnCalendar: {
         calendar: [],
         type: 'arr'
-      }
+      },
+      // 预定参数
+      goBookParams: {}
     }
   },
   methods: {
@@ -282,64 +230,71 @@ export default {
     },
     // 搜索
     async search() {
-      // this.pageObj.deptDate = this.pageObj.deptDate.replace(/-/g, '')
-      // this.pageObj.arrDate = this.pageObj.arrDate.replace(/-/g, '')
-      // console.log(this.pageObj)
       const { data: res } = await this.$http.post('/flight/searchFlight', this.pageObj)
       if (res.status !== 0) return this.$message.error(res.msg)
-      console.log(res)
       this.routings = res.data.routings
-      // console.log(this.routings)
     },
     // 选去程
-    checkSearch(index) {
-      console.log(this.bookParams)
-      console.log(index)
+    checkSearch(params) {
+      this.goBookParams = params
     },
     // 去程日历
     async deptDateFocus() {
       // 获取去程日历的时间
       if (!this.pageObj.deptCity || !this.pageObj.arrCity) return this.$message.error('请先选择出发地和目的地')
-      const { data: res } = await this.$http.post('/flight/avFlightLineCalendar', this.pageObj)
+      let depDateParams = {
+        deptCity: this.pageObj.deptCity,
+        arrCity: this.pageObj.arrCity,
+        startDate: '1990-01-01',
+        endDate: '2222-01-01'
+      }
+      const { data: res } = await this.$http.post('/flight/avFlightLineCalendar', depDateParams)
       if (res.status !== 0) return this.$message.error(res.msg)
       this.deptCalendar.calendar = res.data.flightScheduleCalendar
-      this.showDepDate = !this.showDepDate
-    },
-    deptDateBlur() {
-      // this.showDepDate = false
+      this.showDepDate = true
     },
     // 返程日历
-    async arrDateFocus() {
+    async returnDateFocus() {
       // 获取去程日历的时间
       if (!this.pageObj.deptCity || !this.pageObj.arrCity) return this.$message.error('请先选择出发地和目的地')
-      let arrDateParams = {
+      let returnDateParams = {
         deptCity: this.pageObj.arrCity,
         arrCity: this.pageObj.deptCity,
         startDate: '1990-01-01',
         endDate: '2222-01-01'
       }
-      const { data: res } = await this.$http.post('/flight/avFlightLineCalendar', arrDateParams)
+      const { data: res } = await this.$http.post('/flight/avFlightLineCalendar', returnDateParams)
       if (res.status !== 0) return this.$message.error(res.msg)
-      this.arrCalendar.calendar = res.data.flightScheduleCalendar
-      this.showArrDate = true
-    },
-    arrDateBlur() {
-      // this.showDepDate = false
+      this.returnCalendar.calendar = res.data.flightScheduleCalendar
+      this.showReturnDate = true
     },
     // 子组件选择去程日期，
     getDate(msg) {
       if (msg.type === 'arr') {
-        this.showArrDate = false
-        this.pageObj.arrDate = msg.date
+        this.showReturnDate = false
+        this.pageObj.returnDate = msg.date
       } else {
         this.showDepDate = false
         this.pageObj.deptDate = msg.date
       }
+    },
+    // 预定页面
+    book() {
+      this.goBookParams.pageObj = this.pageObj
+      let pageObj = []
+      pageObj[0] = this.goBookParams
+      this.$router.push({ path: '/order/book', query: this.goBookParams })
     }
   },
   computed: {
     totalCount() {
       return this.pageObj.adultCount + this.pageObj.childCount
+    },
+    isBook() {
+      if (JSON.stringify(this.goBookParams) === '{}') {
+        return true
+      }
+      return false
     }
   }
 }
@@ -460,5 +415,10 @@ export default {
     z-index: 99999;
     left: 0;
     top: 40px
+  }
+  .book{
+    display: flex;
+    justify-content: flex-end;
+    padding-top: 30px;
   }
 </style>

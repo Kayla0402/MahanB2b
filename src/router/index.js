@@ -35,6 +35,7 @@ const Search = () => import(/* webpackChunkName: "order" */ '@components/order/S
 const Reschedule = () => import(/* webpackChunkName: "order" */ '@components/order/Reschedule')
 const Refund = () => import(/* webpackChunkName: "order" */ '@components/order/Refund')
 const OrderList = () => import(/* webpackChunkName: "order" */ '@components/order/OrderList')
+const Book = () => import(/* webpackChunkName: "book" */ '@components/order/Book')
 
 Vue.use(VueRouter)
 const routes = [
@@ -77,7 +78,8 @@ const routes = [
       { path: '/order/search', component: Search },
       { path: '/order/reschedule', component: Reschedule },
       { path: '/order/refund', component: Refund },
-      { path: '/order/orderList', component: OrderList }
+      { path: '/order/orderList', component: OrderList },
+      { path: '/order/book', component: Book }
     ]
   }
 
@@ -102,6 +104,7 @@ router.beforeEach((to, from, next) => {
   if (to.path === '/resetPass') return next()
   if (to.path === '/demo') return next()
   if (to.path === '/calendar') return next()
+  if (to.path === '/order/book') return next()
   const tokenStr = window.sessionStorage.getItem('token')
   if (!tokenStr) return next('/login')
   next()
