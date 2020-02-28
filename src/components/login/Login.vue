@@ -22,7 +22,8 @@
     </div>
   </div>
 </template>
-<script>export default {
+<script>
+export default {
   name: 'Login',
   data () {
     // 邮箱的正则验证规则

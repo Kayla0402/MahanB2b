@@ -1,4 +1,10 @@
 // vue-cli3 工具 生成的项目，默认隐藏了webpack的默认配置
+// 配置别名，引入path模块
+const path = require('path')
+function resolve(dir) {
+  // path.join(__dirname)设置绝对路径
+  return path.join(__dirname, dir)
+}
 module.exports = {
   // 通过chainWebpack 自定义打包入口，将开发和生产环境的打包入口的文件分开
   chainWebpack: config => {
@@ -45,5 +51,11 @@ module.exports = {
         return args
       })
     })
+    // 路径配置
+    config.resolve.alias
+      .set('@components', resolve('./src/components'))
+      .set('@assets', resolve('./src/assets'))
+      .set('@router', resolve('./src/router'))
+      .set('@constants', resolve('./src/constants'))
   }
 }

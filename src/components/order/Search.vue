@@ -144,7 +144,7 @@
 
 <script>
 // 引入城市数据
-import citys from '../../constants/Citys'
+import citys from '@constants/Citys'
 // 导入日期组件
 import Calendar from '../common/Calendar'
 Object.freeze(citys)

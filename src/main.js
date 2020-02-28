@@ -1,11 +1,11 @@
 import Vue from 'vue'
 import App from './App.vue'
-import router from './router'
+import router from '@router'
 import './plugins/element.js'
 // 导入全局样式表
-import './assets/css/global.css'
+import '@assets/css/global.css'
 // 导入字体图标
-import './assets/font/iconfont.css'
+import '../public/font/iconfont.css'
 // axios
 import axios from 'axios'
 // 进度条的导入

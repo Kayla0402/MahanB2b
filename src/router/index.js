@@ -11,30 +11,30 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 // import Goods from '../components/goods/Goods'
 
-const Login = () => import(/* webpackChunkName: "login_home_welcome" */ '../components/login/Login')
-const Home = () => import(/* webpackChunkName: "login_home_welcome" */ '../components/Home')
-const Welcome = () => import(/* webpackChunkName: "login_home_welcome" */ '../components/Welcome')
+const Login = () => import(/* webpackChunkName: "login_home_welcome" */ '@components/login/Login')
+const Home = () => import(/* webpackChunkName: "login_home_welcome" */ '@components/Home')
+const Welcome = () => import(/* webpackChunkName: "login_home_welcome" */ '@components/Welcome')
 
-const Register = () => import(/* webpackChunkName: "register_tips" */ '../components/login/Register')
-const RegisterTips = () => import(/* webpackChunkName: "register_tips" */ '../components/login/RegisterTips')
-const ResetPass = () => import(/* webpackChunkName: "register_tips" */ '../components/login/ResetPass')
+const Register = () => import(/* webpackChunkName: "register_tips" */ '@components/login/Register')
+const RegisterTips = () => import(/* webpackChunkName: "register_tips" */ '@components/login/RegisterTips')
+const ResetPass = () => import(/* webpackChunkName: "register_tips" */ '@components/login/ResetPass')
 
-const Users = () => import(/* webpackChunkName: "rights_users" */ '../components/users/Users')
-const Rights = () => import(/* webpackChunkName: "rights_users" */ '../components/rights/Rights')
-const Roles = () => import(/* webpackChunkName: "rights_users" */ '../components/roles/Roles')
+const Users = () => import(/* webpackChunkName: "rights_users" */ '@components/users/Users')
+const Rights = () => import(/* webpackChunkName: "rights_users" */ '@components/rights/Rights')
+const Roles = () => import(/* webpackChunkName: "rights_users" */ '@components/roles/Roles')
 
-const Categories = () => import(/* webpackChunkName: "categoriese_params" */ '../components/categories/Categories')
+const Categories = () => import(/* webpackChunkName: "categoriese_params" */ '@components/categories/Categories')
 // const Params = () => import(/* webpackChunkName: "categoriese_params" */ '../components/params/Params')
 
-const Add = () => import(/* webpackChunkName: "add_goods" */ '../components/goods/Add')
-const Goods = () => import(/* webpackChunkName: "add_goods" */ '../components/goods/Goods')
+const Add = () => import(/* webpackChunkName: "add_goods" */ '@components/goods/Add')
+const Goods = () => import(/* webpackChunkName: "add_goods" */ '@components/goods/Goods')
 
-const Demo = () => import(/* webpackChunkName: "add_goods" */ '../components/Demo')
-const Calendar = () => import(/* webpackChunkName: "add_goods" */ '../components/calendar')
-const Search = () => import(/* webpackChunkName: "order" */ '../components/order/Search')
-const Reschedule = () => import(/* webpackChunkName: "order" */ '../components/order/Reschedule')
-const Refund = () => import(/* webpackChunkName: "order" */ '../components/order/Refund')
-const OrderList = () => import(/* webpackChunkName: "order" */ '../components/order/OrderList')
+const Demo = () => import(/* webpackChunkName: "add_goods" */ '@components/Demo')
+const Calendar = () => import(/* webpackChunkName: "add_goods" */ '@components/calendar')
+const Search = () => import(/* webpackChunkName: "order" */ '@components/order/Search')
+const Reschedule = () => import(/* webpackChunkName: "order" */ '@components/order/Reschedule')
+const Refund = () => import(/* webpackChunkName: "order" */ '@components/order/Refund')
+const OrderList = () => import(/* webpackChunkName: "order" */ '@components/order/OrderList')
 
 Vue.use(VueRouter)
 const routes = [
