@@ -71,6 +71,19 @@
 export default {
   name: 'Register',
   data() {
+    let validateMobilePhone = (rule, value, callback) => {
+      if (value === '') {
+        callback(new Error('负责人手机号不可为空'))
+      } else {
+        if (value !== '') {
+          let reg = /^1[3456789]\d{9}$/
+          if (!reg.test(value)) {
+            callback(new Error('请输入有效的手机号码'))
+          }
+        }
+        callback()
+      }
+    }
     let validatePass = (rule, value, callback) => {
       if (value === '') {
         callback(new Error('请输入密码'))
@@ -112,8 +125,9 @@ export default {
       // 注册信息校验规则
       registerFormRules: {
         mobile: [
-          { required: true, message: '请输入手机号码', trigger: 'blur' },
-          { min: 11, max: 11, message: '请输入正确的手机号码', trigger: 'blur' }
+          // { required: true, message: '请输入手机号码', trigger: 'blur' },
+          // { min: 11, max: 11, message: '请输入正确的手机号码', trigger: 'blur' }
+          { validator: validateMobilePhone, trigger: 'blur', required: true }
         ],
         password: [
           { validator: validatePass, trigger: 'blur', required: true }
@@ -134,7 +148,7 @@ export default {
           { required: true, message: '请输入公司所在城市', trigger: 'blur' }
         ],
         email: [
-          { message: '请输入邮箱地址', trigger: 'blur' },
+          { required: true, message: '请输入邮箱地址', trigger: 'blur' },
           { type: 'email', message: '请输入正确的邮箱地址', trigger: 'blur' }
         ]
       },

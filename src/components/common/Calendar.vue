@@ -24,22 +24,16 @@
     </ul>
     <!-- 日期 -->
     <ul class="days">
-      <li v-for="(dayobject,index) in days" style="height: 40px;" :key="index" @click="pickDay(dayobject.day)">
-        <span v-if="dayobject.day.getFullYear() < new Date().getFullYear() && dayobject.day.getMonth() < new Date().getMonth()  && dayobject.day.getDate() < new Date().getDate()"
-              class="other-month">{{ dayobject.day.getMonth() }}</span>
+      <li v-for="(dayobject,index) in days" style="height: 40px;" :key="index">
+        <span v-if="dayobject.day< new Date()" class="other-month" @click="tips">
+          {{ dayobject.day.getDate()}}</span>
         <span v-else>
-            <span v-if="dayobject.index>=0" class="active">{{ dayobject.day.getDate() }}</span>
+            <span v-if="dayobject.index>=0" class="active"  @click="pickDay(dayobject.day)">{{ dayobject.day.getDate() }}</span>
             <span v-else class="other-month">{{ dayobject.day.getDate() }}</span>
         </span>
-<!--        <span v-if="dayobject.day.getMonth()+1 != currentMonth || dayobject.day.getMonth() == new Date().getMonth()&&dayobject.day.getDate() < new Date().getDate()" class="other-month">{{ dayobject.day.getDate() }}</span>&ndash;&gt;-->
-<!--        <span v-else>-->
-<!--          <span-->
-<!--            v-if="dayobject.day.getFullYear() == new Date().getFullYear() && dayobject.day.getMonth() == new Date().getMonth() && dayobject.day.getDate() == new Date().getDate()"-->
-<!--            class="active">{{ dayobject.day.getDate() }}</span>-->
-<!--          <span v-else>{{ dayobject.day.getDate() }}</span>-->
-<!--        </span>-->
       </li>
     </ul>
+    <el-button size="small" @click="closeCalendar">关闭</el-button>
   </div>
 </template>
 
@@ -48,7 +42,7 @@ export default {
   name: 'demo',
   props: {
     dates: {
-      type: Array,
+      type: Object,
       default() {
         return {}
       }
@@ -61,7 +55,7 @@ export default {
       currentYear: 1970,
       currentWeek: 1,
       days: [],
-      activeDays: this.dates
+      activeDays: this.dates.calendar
     }
   },
   created: function() { // 在vue初始化时调用
@@ -129,7 +123,6 @@ export default {
         }
         this.days.push(dayobject)
       }
-      console.log(this.days)
     },
     pickPre: function(year, month) {
       // setDate(0); 上月最后一天
@@ -148,7 +141,10 @@ export default {
       alert(year + ',' + month)
     },
     pickDay(day) {
-      console.log(day)
+      this.$emit('pickDate', { date: this.dateReset(day), closeCalendar: true, type: this.dates.type })
+    },
+    tips() {
+      this.$message.warning('请选择有日期的航班')
     },
     // 返回 类似 2016-01-02 格式的字符串
     formatDate: function(year, month, day) {
@@ -158,6 +154,15 @@ export default {
       let d = day
       if (d < 10) d = '0' + d
       return y + '-' + m + '-' + d
+    },
+    dateReset: function(day) {
+      let y = day.getFullYear()
+      let m = (day.getMonth() + 1) < 10 ? '0' + (day.getMonth() + 1) : '' + (day.getMonth() + 1)
+      let d = (day.getDate()) < 10 ? '0' + (day.getDate()) : '' + (day.getDate())
+      return y + '-' + m + '-' + d
+    },
+    closeCalendar: function() {
+      this.$emit('pickDate', { date: '', closeCalendar: true, type: this.dates.type })
     }
   }
 }
@@ -266,5 +271,8 @@ export default {
   }
   .days li:hover {
     background: #e1e1e1;
+  }
+  .el-button{
+    float: right;
   }
 </style>

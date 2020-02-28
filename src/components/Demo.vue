@@ -175,46 +175,51 @@
 <!--  }-->
 <!--</style>-->
 <template>
-  <div id="calendar">
-    <div class="month">
-      <ul>
-        <!--点击会触发pickpre函数，重新刷新当前日期 @click(vue v-on:click缩写) -->
-        <li class="arrow" @click="pickPre(currentYear,currentMonth)">❮</li>
-        <li class="year-month" @click="pickYear(currentYear,currentMonth)">
-          <span class="choose-year">{{ currentYear }}</span>
-          <span class="choose-month">{{ currentMonth }}月</span>
-        </li>
-        <li class="arrow" @click="pickNext(currentYear,currentMonth)">❯</li>
-      </ul>
-    </div>
-    <!-- 星期 -->
-    <ul class="weekdays">
-      <li>一</li>
-      <li>二</li>
-      <li>三</li>
-      <li>四</li>
-      <li>五</li>
-      <li style="color:red">六</li>
-      <li style="color:red">日</li>
-    </ul>
-    <!-- 日期 -->
-    <ul class="days">
-      <!-- v-for循环 每一次循环用<li>标签创建一天 -->
-      <li v-for="(dayobject,index) in days" style="height: 40px;" :key="index" @click="pickDay(dayobject.day)">
-        <!--本月-->
-        <!--如果不是本月  改变类名加灰色-->
-        <span v-if="dayobject.day.getMonth()+1 < currentMonth || dayobject.day.getMonth() == new Date().getMonth()&&dayobject.day.getDate() < new Date().getDate()" class="other-month">{{ dayobject.day.getDate() }}</span>
+<!--  <div id="calendar" ref="box" v-if="isShowDialog">-->
+<!--    <div class="month">-->
+<!--      <ul>-->
+<!--        &lt;!&ndash;点击会触发pickpre函数，重新刷新当前日期 @click(vue v-on:click缩写) &ndash;&gt;-->
+<!--        <li class="arrow" @click="pickPre(currentYear,currentMonth)">❮</li>-->
+<!--        <li class="year-month" @click="pickYear(currentYear,currentMonth)">-->
+<!--          <span class="choose-year">{{ currentYear }}</span>-->
+<!--          <span class="choose-month">{{ currentMonth }}月</span>-->
+<!--        </li>-->
+<!--        <li class="arrow" @click="pickNext(currentYear,currentMonth)">❯</li>-->
+<!--      </ul>-->
+<!--    </div>-->
+<!--    &lt;!&ndash; 星期 &ndash;&gt;-->
+<!--    <ul class="weekdays">-->
+<!--      <li>一</li>-->
+<!--      <li>二</li>-->
+<!--      <li>三</li>-->
+<!--      <li>四</li>-->
+<!--      <li>五</li>-->
+<!--      <li style="color:red">六</li>-->
+<!--      <li style="color:red">日</li>-->
+<!--    </ul>-->
+<!--    &lt;!&ndash; 日期 &ndash;&gt;-->
+<!--    <ul class="days">-->
+<!--      &lt;!&ndash; v-for循环 每一次循环用<li>标签创建一天 &ndash;&gt;-->
+<!--      <li v-for="(dayobject,index) in days" style="height: 40px;" :key="index" @click="pickDay(dayobject.day)">-->
+<!--        &lt;!&ndash;本月&ndash;&gt;-->
+<!--        &lt;!&ndash;如果不是本月  改变类名加灰色&ndash;&gt;-->
+<!--        <span v-if="dayobject.day< new Date()" class="other-month">-->
+<!--          {{ dayobject.day.getDate()}}</span>-->
 
-        <!--如果是本月  还需要判断是不是这一天-->
-        <span v-else>
-          <!--今天  同年同月同日-->
-          <span
-            v-if="dayobject.day.getFullYear() == new Date().getFullYear() && dayobject.day.getMonth() == new Date().getMonth() && dayobject.day.getDate() == new Date().getDate()"
-            class="active">{{ dayobject.day.getDate() }}</span>
-          <span v-else>{{ dayobject.day.getDate() }}</span>
-        </span>
-      </li>
-    </ul>
+<!--        &lt;!&ndash;如果是本月  还需要判断是不是这一天&ndash;&gt;-->
+<!--        <span v-else>-->
+<!--          &lt;!&ndash;今天  同年同月同日&ndash;&gt;-->
+<!--          <span-->
+<!--            v-if="dayobject.day.getFullYear() == new Date().getFullYear() && dayobject.day.getMonth() == new Date().getMonth() && dayobject.day.getDate() == new Date().getDate()"-->
+<!--            class="active">{{ dayobject.day.getDate() }}</span>-->
+<!--          <span v-else>{{ dayobject.day.getDate() }}</span>-->
+<!--        </span>-->
+<!--      </li>-->
+<!--    </ul>-->
+<!--  </div>-->
+  <div class="index" @click.stop>
+    <button @click="isShow = !isShow ">{{ isShow ? '关闭':'打开' }}弹窗</button>
+    <div class="content" v-show="isShow"></div>
   </div>
 </template>
 
@@ -228,11 +233,19 @@ export default {
       currentYear: 1970,
       currentWeek: 1,
       days: [],
-      activeDays: ['2020-02-28', '2020-02-29', '2020-03-10', '2020-03-15']
+      activeDays: ['2020-02-28', '2020-02-29', '2020-03-10', '2020-03-15'],
+      isShowDialog: true,
+      isShow: false
     }
   },
   created: function() { // 在vue初始化时调用
     this.initData(null)
+    document.addEventListener('click', (e) => {
+      console.log(this.$refs.box.contains(e.target))
+      if (!this.$refs.box.contains(e.target)) {
+        this.isShowDialog = false
+      }
+    })
   },
   methods: {
     initData: async function(cur) {
@@ -329,6 +342,11 @@ export default {
       if (d < 10) d = '0' + d
       return y + '-' + m + '-' + d
     }
+  },
+  mounted() {
+    document.body.addEventListener('click', () => {
+      this.isShow = false
+    }, false)
   }
 }
 </script>
@@ -436,6 +454,13 @@ export default {
   }
   .days li:hover {
     background: #e1e1e1;
+  }
+  .index { width:200px; }
+  .content {
+    margin-top:10px;
+    width:200px;
+    height:200px;
+    background:#ccc;
   }
 </style>
 

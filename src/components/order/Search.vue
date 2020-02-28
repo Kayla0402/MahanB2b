@@ -38,17 +38,16 @@
         <el-col :span="4" class="rowCenter date">
           出发日期：
           <el-input
-            placeholder="请选择出发日期"
             v-model="pageObj.deptDate" @focus="deptDateFocus" @blur="deptDateBlur">
           </el-input>
-          <calendar class="calendar" v-if="showDepDate" :dates="deptCalendar"/>
+          <calendar class="calendar" v-show="showDepDate" :dates="deptCalendar" @pickDate="getDate"/>
         </el-col>
         <el-col :span="4" class="rowCenter date" v-if="pageObj.type==='RT'">
           返程日期：
           <el-input
-            placeholder="请选择出发日期"
-            v-model="pageObj.arrDate">
+            v-model="pageObj.arrDate"  @focus="arrDateFocus" @blur="arrDateBlur">
           </el-input>
+          <calendar class="calendar" v-if="showArrDate" :dates="arrCalendar" @pickDate="getDate"/>
         </el-col>
         <el-col :span="2" style="position: relative">
           <div class="search_num" @mouseover="showNum=true" @mouseleave="showNum=false">
@@ -161,8 +160,8 @@ export default {
         type: 'OW',
         deptCity: '',
         arrCity: '',
-        deptDate: '2020-02-28',
-        arrDate: '2020-03-29',
+        deptDate: '',
+        arrDate: '',
         adultCount: 1,
         childCount: 0,
         cabinType: 'C',
@@ -236,11 +235,21 @@ export default {
       },
       // 控制去程日历的显示
       showDepDate: false,
+      showArrDate: false,
       // 去程时间数据
-      deptCalendar: []
+      deptCalendar: {
+        calendar: [],
+        type: 'dept'
+      },
+      // 返程时间数据
+      arrCalendar: {
+        calendar: [],
+        type: 'arr'
+      }
     }
   },
   methods: {
+    // 日期转换的方法
     handleChangeDep(value) {
       if (value.length > 0) {
         this.pageObj.deptCity = value[1]
@@ -273,12 +282,14 @@ export default {
     },
     // 搜索
     async search() {
+      // this.pageObj.deptDate = this.pageObj.deptDate.replace(/-/g, '')
+      // this.pageObj.arrDate = this.pageObj.arrDate.replace(/-/g, '')
       // console.log(this.pageObj)
-      const { data: res } = await this.$http.post('/flight/searchFlight', this.test2)
+      const { data: res } = await this.$http.post('/flight/searchFlight', this.pageObj)
       if (res.status !== 0) return this.$message.error(res.msg)
       console.log(res)
       this.routings = res.data.routings
-      console.log(this.routings)
+      // console.log(this.routings)
     },
     // 选去程
     checkSearch(index) {
@@ -291,11 +302,39 @@ export default {
       if (!this.pageObj.deptCity || !this.pageObj.arrCity) return this.$message.error('请先选择出发地和目的地')
       const { data: res } = await this.$http.post('/flight/avFlightLineCalendar', this.pageObj)
       if (res.status !== 0) return this.$message.error(res.msg)
-      this.deptCalendar = res.data.flightScheduleCalendar
-      this.showDepDate = true
+      this.deptCalendar.calendar = res.data.flightScheduleCalendar
+      this.showDepDate = !this.showDepDate
     },
     deptDateBlur() {
       // this.showDepDate = false
+    },
+    // 返程日历
+    async arrDateFocus() {
+      // 获取去程日历的时间
+      if (!this.pageObj.deptCity || !this.pageObj.arrCity) return this.$message.error('请先选择出发地和目的地')
+      let arrDateParams = {
+        deptCity: this.pageObj.arrCity,
+        arrCity: this.pageObj.deptCity,
+        startDate: '1990-01-01',
+        endDate: '2222-01-01'
+      }
+      const { data: res } = await this.$http.post('/flight/avFlightLineCalendar', arrDateParams)
+      if (res.status !== 0) return this.$message.error(res.msg)
+      this.arrCalendar.calendar = res.data.flightScheduleCalendar
+      this.showArrDate = true
+    },
+    arrDateBlur() {
+      // this.showDepDate = false
+    },
+    // 子组件选择去程日期，
+    getDate(msg) {
+      if (msg.type === 'arr') {
+        this.showArrDate = false
+        this.pageObj.arrDate = msg.date
+      } else {
+        this.showDepDate = false
+        this.pageObj.deptDate = msg.date
+      }
     }
   },
   computed: {
