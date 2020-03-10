@@ -42,6 +42,12 @@ Vue.filter('dateReset', function(originVal) {
   // return `yyyy-mm-dd hh:mm:ss`
   return `${y}-${m}-${d} ${hh}:${mm}`
 })
+Vue.filter('timeReset', function(originVal) {
+  const hh = originVal.substring(8, 10)
+  const mm = originVal.substring(10, 12)
+  // return `yyyy-mm-dd hh:mm:ss`
+  return `${hh}:${mm}`
+})
 // axios.defaults.baseURL = 'http://renoblog.xyz/api/private/v1/'
 axios.defaults.baseURL = 'http://47.75.7.170:8080/'
 // axios.defaults.baseURL = 'http://119.3.183.37:8888/api/private/v1/'

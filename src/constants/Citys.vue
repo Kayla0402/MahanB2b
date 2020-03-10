@@ -158,6 +158,5 @@ let citys = [
     }]
   }
 ]
-// Object.freeze(citys)
 export default citys
 </script>

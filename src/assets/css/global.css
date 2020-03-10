@@ -2,7 +2,7 @@ html,body,#app{
     height: 100%;
     margin: 0;
     padding: 0;
-    min-width: 1366px;
+    min-width: 1000px;
     /*overflow-y: scroll;*/
 }
 .el-breadcrumb{
@@ -36,4 +36,24 @@ html,body,#app{
 }
 .mL10{
     margin-left: 10px
+}
+.f14{
+    font-size: 14px;
+}
+.justEnd{
+    display: flex;
+    justify-content: flex-end;
+}
+.justCenter{
+    display: flex;
+    justify-content: center;}
+.justStart{
+    display: flex;
+    justify-content: flex-start;
+}
+.mt15{
+    margin-top: 15px;
+}
+.mr15{
+    margin-right: 15px;
 }

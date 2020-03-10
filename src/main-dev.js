@@ -13,6 +13,11 @@ import NProgress from 'nprogress'
 import 'nprogress/nprogress.css'
 // 树形图
 import TreeTable from 'vue-table-with-tree-grid'
+// 全局的变量
+// import '@constants/Citys'
+// 全局的方法
+import globalFuc from '@components/common/global'
+Vue.use(globalFuc)
 
 Vue.component('tree-table', TreeTable)
 /*
@@ -40,6 +45,12 @@ Vue.filter('dateReset', function(originVal) {
   const mm = originVal.substring(10, 12)
   // return `yyyy-mm-dd hh:mm:ss`
   return `${y}-${m}-${d} ${hh}:${mm}`
+})
+Vue.filter('timeReset', function(originVal) {
+  const hh = originVal.substring(8, 10)
+  const mm = originVal.substring(10, 12)
+  // return `yyyy-mm-dd hh:mm:ss`
+  return `${hh}:${mm}`
 })
 
 // axios.defaults.baseURL = 'http://renoblog.xyz/api/private/v1/'

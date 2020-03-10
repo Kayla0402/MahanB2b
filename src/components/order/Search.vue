@@ -162,7 +162,9 @@ export default {
       pageObj: {
         type: 'OW',
         deptCity: '',
+        deptCityCN: '',
         arrCity: '',
+        arrCityCN: '',
         deptDate: '',
         returnDate: '',
         adultCount: 1,
@@ -197,10 +199,23 @@ export default {
     }
   },
   methods: {
+    // 级联选择器获取对象,添加三字码
+    getCascaderObj(val, opt) {
+      return val.map(function (value, index, array) {
+        for (let itm of opt) {
+          if (itm.value === value) {
+            opt = itm.children
+            return itm.label
+          }
+        }
+        return null
+      })
+    },
     // 日期转换的方法
     handleChangeDep(value) {
       if (value.length > 0) {
         this.pageObj.deptCity = value[1]
+        this.pageObj.deptCityCN = this.getCascaderObj(value, this.options)[1]
       } else {
         this.pageObj.deptCity = ''
       }
@@ -208,6 +223,7 @@ export default {
     handleChangeArr(value) {
       if (value.length > 0) {
         this.pageObj.arrCity = value[1]
+        this.pageObj.arrCityCN = this.getCascaderObj(value, this.options)[1]
       } else {
         this.pageObj.arrCity = ''
       }
@@ -230,6 +246,7 @@ export default {
     },
     // 搜索
     async search() {
+      if (this.pageObj.type === 'OW') this.pageObj.returnDate = ''
       const { data: res } = await this.$http.post('/flight/searchFlight', this.pageObj)
       if (res.status !== 0) return this.$message.error(res.msg)
       this.routings = res.data.routings
@@ -281,9 +298,29 @@ export default {
     // 预定页面
     book() {
       this.goBookParams.pageObj = this.pageObj
-      let pageObj = []
-      pageObj[0] = this.goBookParams
-      this.$router.push({ path: '/order/book', query: this.goBookParams })
+      let pageObj = {}
+      pageObj = this.goBookParams
+      pageObj.depSegment = {}
+      pageObj.depSegment = this.handelForEach(this.goBookParams.depSegments, pageObj.depSegment)
+      this.$router.push({ path: '/order/book', query: pageObj })
+    },
+    // 遍历数据
+    handelForEach(depSegments, segments) {
+      if (depSegments.length === 2) {
+        segments = depSegments[0]
+        segments.transfer = true
+        segments.transferAirport = depSegments[0].arrAirport
+        segments.transferAirportStr = depSegments[0].arrAirportStr
+        segments.arrAirport = depSegments[1].arrAirport
+        segments.arrAirportStr = depSegments[1].arrAirportStr
+        segments.flightNo2 = depSegments[1].flightNo
+        segments.arrDate = depSegments[1].arrDate
+        segments.transferTime = depSegments[1].depDate - depSegments[0].arrDate
+      } else {
+        segments = depSegments[0]
+        segments.transfer = false
+      }
+      return segments
     }
   },
   computed: {

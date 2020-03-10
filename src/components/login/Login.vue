@@ -54,7 +54,6 @@ export default {
         ],
         password: [
           { required: true, message: '请输入用户密码', trigger: 'blur' }
-          // { min: 6, max: 15, message: '长度在 6 到 15 个字符', trigger: 'blur' }
         ]
       }
     }
@@ -68,9 +67,10 @@ export default {
         if (!valid) return
         if (this.loginForm.username.indexOf('@') !== -1) this.loginForm.type = 2
         const { data: res } = await this.$http.post('/user/login', this.loginForm)
-        // console.log(res)
+        console.log(res)
         if (res.status !== 0) return this.$message.error(res.msg)
         this.$message.success('登录成功')
+        sessionStorage.setItem('userInfo', JSON.stringify(res.data))
         /*
         * 1.登录成功之后的token，保存到客户端的sessionStorage中
         * 1.1项目中除了登录之外的其他页面，必须在登录后才能访问
