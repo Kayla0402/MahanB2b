@@ -195,7 +195,9 @@ export default {
         type: 'arr'
       },
       // 预定参数
-      goBookParams: {}
+      goBookParams: {},
+      // 查询页面的sessionId
+      sessionId: ''
     }
   },
   methods: {
@@ -250,6 +252,7 @@ export default {
       const { data: res } = await this.$http.post('/flight/searchFlight', this.pageObj)
       if (res.status !== 0) return this.$message.error(res.msg)
       this.routings = res.data.routings
+      this.sessionId = res.data.sessionId
     },
     // 选去程
     checkSearch(params) {
@@ -301,6 +304,7 @@ export default {
       let pageObj = {}
       pageObj = this.goBookParams
       pageObj.depSegment = {}
+      pageObj.sessionId = this.sessionId
       pageObj.depSegment = this.handelForEach(this.goBookParams.depSegments, pageObj.depSegment)
       this.$router.push({ path: '/order/book', query: pageObj })
     },

@@ -238,7 +238,6 @@ export default {
   },
   created() {
     this.ticketInfo = this.$route.query
-    console.log(this.ticketInfo)
     this.userId = this.getToken('token')
     this.getContacts()
     this.getUsers()
@@ -305,7 +304,7 @@ export default {
       }
     },
     // 提交订单
-    submit() {
+    async submit() {
       // 如果是添加联系人，验证表单
       if (this.userUuid === 10) {
         this.$refs.addContactRefs.validate(valid => {
@@ -322,24 +321,26 @@ export default {
         privateKey: '',
         sessionId: this.sessionId
       }
-      console.log(params)
+      const { data: res } = await this.$http.post('/flight/book', params)
+      console.log(res)
+      if (res.status !== 0) return this.$message.error(res.msg)
     },
     // 验价
     async testPrice() {
       let params = {
         routing: this.ticketInfo,
-        appId: 'string',
-        privateKey: 'string',
+        appId: '',
+        privateKey: '',
         adultNum: this.ticketInfo.pageObj.adultCount,
-        childNum: this.ticketInfo.pageObj.childCount
+        childNum: this.ticketInfo.pageObj.childCount,
+        sessionId: this.ticketInfo.sessionId
       }
       const { data: res } = await this.$http.post('/flight/price', params)
       if (res.status !== 0) {
         this.$router.push('/order/search')
         return this.$message.error('验价失败，请重新查询')
       }
-      console.log(res)
-      // this.sessionId = res.data.sessionId
+      this.sessionId = res.data.sessionId
     }
   },
   computed: {
