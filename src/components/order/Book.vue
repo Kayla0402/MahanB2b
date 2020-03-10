@@ -328,8 +328,8 @@ export default {
     async testPrice() {
       let params = {
         routing: this.ticketInfo,
-        appId: '',
-        privateKey: '',
+        appId: 'string',
+        privateKey: 'string',
         adultNum: this.ticketInfo.pageObj.adultCount,
         childNum: this.ticketInfo.pageObj.childCount
       }
